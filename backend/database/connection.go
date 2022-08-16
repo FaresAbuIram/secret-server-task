@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	"secret-server-task/backend/models"
@@ -19,7 +20,7 @@ var (
 )
 
 func Connect() {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://admin:uKtVSqpoiu3IMfBj@cluster0.gzyivh9.mongodb.net/?retryWrites=true&w=majority"))
+	client, err := mongo.NewClient(options.Client().ApplyURI(os.Getenv("MONGO_URL")))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,8 +31,8 @@ func Connect() {
 		log.Fatal(err)
 	}
 
-	secretDatabase := client.Database("secret-server-task")
-	SecretsCollection = secretDatabase.Collection("secrets")
+	secretDatabase := client.Database(os.Getenv("MONGO_DATABASE"))
+	SecretsCollection = secretDatabase.Collection(os.Getenv("MONGO_COLLECTION"))
 }
 
 func GetSecret(id string) (models.Secret, error) {
