@@ -25,7 +25,10 @@ export default {
             }).then((response) => {
               this.$isLoading(false)
               this.$router.push({name: 'share', params: { token: response.data.data.replaceAll('.', '/')}}) 
-            })
+            }).catch(error => {
+              this.$isLoading(false)
+              This.router.push({name: 'notfound'})
+            })  
         }
       
     }

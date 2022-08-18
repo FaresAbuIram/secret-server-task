@@ -8,10 +8,12 @@
             "post": {
                 "description": "This route generates a new secret have the user's data",
                 "consumes": [
-                    "application/json"
+                    "application/json",
+                    "text/xml"
                 ],
                 "produces": [
-                    "application/json"
+                    "application/json",
+                    "text/xml"
                 ],
                 "tags": [
                     "token"
@@ -38,7 +40,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/models.ErrorModel"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorModel"
                         }
                     }
                 }
@@ -48,10 +56,12 @@
             "post": {
                 "description": "This routes generate new secret have the user's data",
                 "consumes": [
-                    "application/json"
+                    "application/json",
+                    "text/xml"
                 ],
                 "produces": [
-                    "application/json"
+                    "application/json",
+                    "text/xml"
                 ],
                 "tags": [
                     "token"
@@ -76,13 +86,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/models.ErrorModel"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/models.ErrorModel"
                         }
                     }
                 }
@@ -109,6 +119,14 @@
                 }
             }
         },
+        "models.ErrorModel": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ResponseData": {
             "type": "object",
             "properties": {
@@ -127,6 +145,9 @@
             "type": "object",
             "properties": {
                 "data": {
+                    "type": "string"
+                },
+                "message": {
                     "type": "string"
                 }
             }

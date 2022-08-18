@@ -12,6 +12,11 @@ definitions:
     - expire
     - views
     type: object
+  models.ErrorModel:
+    properties:
+      message:
+        type: string
+    type: object
   models.ResponseData:
     properties:
       data:
@@ -24,6 +29,8 @@ definitions:
   models.ResultToken:
     properties:
       data:
+        type: string
+      message:
         type: string
     type: object
   models.Secret:
@@ -43,6 +50,7 @@ paths:
     post:
       consumes:
       - application/json
+      - text/xml
       description: This route generates a new secret have the user's data
       parameters:
       - description: Generate a secret
@@ -53,6 +61,7 @@ paths:
           $ref: '#/definitions/models.Data'
       produces:
       - application/json
+      - text/xml
       responses:
         "200":
           description: OK
@@ -61,7 +70,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            type: object
+            $ref: '#/definitions/models.ErrorModel'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorModel'
       summary: Create a new secret
       tags:
       - token
@@ -69,6 +82,7 @@ paths:
     post:
       consumes:
       - application/json
+      - text/xml
       description: This routes generate new secret have the user's data
       parameters:
       - description: get the secret info
@@ -78,6 +92,7 @@ paths:
         type: string
       produces:
       - application/json
+      - text/xml
       responses:
         "200":
           description: OK
@@ -86,11 +101,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            type: object
+            $ref: '#/definitions/models.ErrorModel'
         "500":
           description: Internal Server Error
           schema:
-            type: object
+            $ref: '#/definitions/models.ErrorModel'
       summary: analyze the secret
       tags:
       - token

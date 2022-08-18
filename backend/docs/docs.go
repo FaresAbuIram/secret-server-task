@@ -20,10 +20,12 @@ const docTemplate = `{
             "post": {
                 "description": "This route generates a new secret have the user's data",
                 "consumes": [
-                    "application/json"
+                    "application/json",
+                    "text/xml"
                 ],
                 "produces": [
-                    "application/json"
+                    "application/json",
+                    "text/xml"
                 ],
                 "tags": [
                     "token"
@@ -50,7 +52,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/models.ErrorModel"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorModel"
                         }
                     }
                 }
@@ -60,10 +68,12 @@ const docTemplate = `{
             "post": {
                 "description": "This routes generate new secret have the user's data",
                 "consumes": [
-                    "application/json"
+                    "application/json",
+                    "text/xml"
                 ],
                 "produces": [
-                    "application/json"
+                    "application/json",
+                    "text/xml"
                 ],
                 "tags": [
                     "token"
@@ -88,13 +98,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/models.ErrorModel"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/models.ErrorModel"
                         }
                     }
                 }
@@ -121,6 +131,14 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ErrorModel": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ResponseData": {
             "type": "object",
             "properties": {
@@ -139,6 +157,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "data": {
+                    "type": "string"
+                },
+                "message": {
                     "type": "string"
                 }
             }
