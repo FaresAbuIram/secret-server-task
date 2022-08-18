@@ -16,23 +16,35 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// Generate new secret
+// @Summary      Create a new secret
+// @Description  This route generates a new secret have the user's data
+// @Tags         token
+// @Accept       json
+// @Produce      json
+// @Param        body  body      models.Data  true  "Generate a secret"
+// @Success      200  {object}  models.ResultToken
+// @Failure      400  {object}	  object
+// @Router       /generate [post]
 func GenerateToken(context *gin.Context) {
-	var input models.Secret
+	var input models.Data
 	if err := context.BindJSON(&input); err != nil {
-		fmt.Println("err: ", err)
-		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Error on create secret.", "data": err})
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Error in creating a secret."})
 		return
 	}
+
+	var mySigningKey = []byte(os.Getenv("SECRET_TOKEN"))
+	expirationTime := time.Now().Add(time.Minute * time.Duration(input.Expire))
+
 	// add object to database
 	result, err := database.SecretsCollection.InsertOne(database.Ctx, bson.D{
-		{Key: "expire", Value: input.Expire},
+		{Key: "expire_date", Value: expirationTime},
 		{Key: "views", Value: input.Views},
 	})
 	if err != nil {
-		fmt.Println(err)
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Error in creating a secret."})
 	}
-	var mySigningKey = []byte(os.Getenv("SECRET_TOKEN"))
-	expirationTime := time.Now().Add(time.Microsecond * time.Duration(input.Expire))
+
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = result.InsertedID
@@ -42,17 +54,26 @@ func GenerateToken(context *gin.Context) {
 	tokenString, err := token.SignedString(mySigningKey)
 
 	if err != nil {
-		fmt.Println(err)
-
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Error in creating a secret."})
 	}
 
 	context.JSON(http.StatusOK, gin.H{"data": tokenString})
 
 }
 
+// Get the secret Information
+// @Summary      analyze the secret
+// @Description  This routes generate new secret have the user's data
+// @Tags         token
+// @Accept       json
+// @Produce      json
+// @Param        token  path      string  true  "get the secret info"
+// @Success      200  {object}    models.ResponseData
+// @Failure      400  {object}	  object
+// @Failure      500  {object}	  object
+// @Router       /get/{token} [post]
 func GetToken(context *gin.Context) {
 	tokenString := context.Param("token")
-
 	claims := jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("SECRET_TOKEN")), nil
@@ -65,6 +86,7 @@ func GetToken(context *gin.Context) {
 
 	info := token.Claims.(*jwt.MapClaims)
 	id := (*info)["id"]
+	secretData := (*info)["data"]
 	objectId, err := primitive.ObjectIDFromHex(fmt.Sprintf("%v", id))
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input"})
@@ -97,8 +119,8 @@ func GetToken(context *gin.Context) {
 	_, err = database.SecretsCollection.UpdateOne(database.Ctx, filter, update)
 
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "something get wrong"})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "something get wrong"})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"data": object})
+	context.JSON(http.StatusOK, gin.H{"data": secretData, "object": object, "message": "success"})
 }
