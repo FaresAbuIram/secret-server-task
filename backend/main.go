@@ -17,9 +17,9 @@ func main() {
 		log.Fatalf("Error loading .env file")
 	}
 	database.Connect()
-	
 
 	router := gin.Default()
+
 	router.Use(cors.Default())
 	routes.Setup(router)
 	router.Run("localhost:9090")
