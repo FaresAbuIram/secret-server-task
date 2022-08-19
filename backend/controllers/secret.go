@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"secret-server-task/backend/database"
-	"secret-server-task/backend/models"
+	"backend/database"
+	"backend/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
